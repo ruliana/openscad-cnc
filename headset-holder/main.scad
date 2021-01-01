@@ -125,7 +125,7 @@ module assembled() {
   translate([0, thickness, height - holder_pocket_depth + 1])
     rotate(90, [1, 0, 0])
     holder();
-    
+
   mirror([0, 1, 0])
     translate([0, thickness, height - holder_pocket_depth + 1])
     rotate(90, [1, 0, 0])
@@ -141,8 +141,10 @@ module flat_pack() {
   translate([105, 0, thickness / 2]) rotate([90, 0, 0]) pole();
 }
 
-/* assembled(); */
+/* Assembled */
+!assembled();
 
+/* Flat pack for cutting */
 // Surface to fit
-/* %square([270, 270], center=true); */
+// %square([270, 270], center=true);
 flat_pack();
