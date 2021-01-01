@@ -18,7 +18,7 @@ It was my second project on the CNC (after a simple box). It made me relearn tri
 - extensions - Utility functions and modules I wrote.
 - lib - Utility functions and modules others wrote.
     - Round Anything - https://github.com/Irev-Dev/Round-Anything
-- \<model-name/\> - Folder with everything related to that project.
-- \<model-name/\>/main.stl - The model itself.
+- \<model-name/> - Folder with everything related to that project.
+- \<model-name/>/main.stl - The model itself.
 
 Libraries are usually cloned from their original repositories. Check the [lib/README](lib/README.markdown) for their links.
