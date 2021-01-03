@@ -13,6 +13,15 @@ It was my second project on the CNC (after a simple box). It made me relearn tri
 - [Assembled](headset-holder/headset-holder-assembled.stl) version.
 - [Flat pack](headset-holder/headset-holder-flat-pack.stl) ready for cutting on a 280x280mm sheet.
 
+### sliced-cup
+
+A cup made of horizontal slices.
+
+Here I'm experimenting with double-side milling.
+
+- [Assembled](sliced-cup/headset-holder-assembled.stl) version.
+- [Flat pack](sliced-cup/headset-holder-flat-pack.stl) ready for cutting.
+
 ## Project structure
 
 - extensions - Utility functions and modules I wrote.

@@ -2,5 +2,10 @@
 .idea
 *.log
 tmp/
+
+# G-code
+*.nc
+
+# External packages
 lib/*
 !lib/README.markdown
