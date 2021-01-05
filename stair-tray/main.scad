@@ -6,9 +6,10 @@ $fn = 100;
 INCH = 25.4;
 bit_diameter = 1/4 * INCH;
 
-thickness = 22;
-width = 300;
-depth = 300;
+// test material 53 height;
+thickness = 22.5;
+width = 380;
+depth = 250;
 rounded_corner_radius = thickness;
 border_distance = 10;
 
