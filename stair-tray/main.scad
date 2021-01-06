@@ -7,16 +7,16 @@ INCH = 25.4;
 bit_diameter = 1/4 * INCH;
 
 // test material 53 height;
-thickness = 22.5;
+thickness = 22.5 - 10;
 width = 380;
 depth = 250;
 rounded_corner_radius = thickness;
 border_distance = 10;
 
-fence_height = thickness;
+fence_height = 10;
 fence_thickness = thickness / 2;
-gap_depth = 187;
-gap_height = 13;
+gap_depth = 175;
+gap_height = 4;
 
 module base_slab() {
   rounded_cube([width, depth, thickness], rounded_corner_radius, center=true);
@@ -47,7 +47,7 @@ module fence() {
 
 module assembled() {
   base();
-  translate([0, 0, thickness]) fence();
+  translate([0, 0, fence_height]) fence();
 }
 
 module flat_pack() {
@@ -55,5 +55,22 @@ module flat_pack() {
   translate([-(fence_thickness + 1.8 * bit_diameter), fence_thickness + 1.8 * bit_diameter, 0]) fence();
 }
 
+// For two-side milling
+module upper_side() {
+  assembled();
+}
+
+module bottom_side() {
+  difference() {
+    rotate([180, 0, 0]) assembled();
+    translate([0, 0, -(thickness + 10) / 2])
+      cube([width + 1, depth + 1, thickness + 10], center=true);
+  }
+}
+
 assembled();
 !flat_pack();
+
+// Two sides milling
+upper_side();
+bottom_side();

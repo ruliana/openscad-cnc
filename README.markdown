@@ -19,8 +19,18 @@ A cup made of horizontal slices.
 
 Here I'm experimenting with double-side milling.
 
-- [Assembled](sliced-cup/headset-holder-assembled.stl) version.
-- [Flat pack](sliced-cup/headset-holder-flat-pack.stl) ready for cutting.
+- [Assembled](sliced-cup/sliced-cup-assembled.stl) version.
+- [Flat pack](sliced-cup/sliced-cup-flat-pack.stl) ready for cutting.
+
+### stair-tray
+
+A tray to put things upstairs that need to go to the main floor.
+
+First real and very simple project with double-side milling. It's really specific for my house.
+
+- [Assembled](stair-tray/stair-tray-assembled.stl) version.
+- [Flat pack](stair-tray/stair-tray-flat-pack.stl) ready for cutting.
+
 
 ## Project structure
 
