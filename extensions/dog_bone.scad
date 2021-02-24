@@ -1,3 +1,5 @@
+// DEPRECATED: Use "pocket.scad"
+
 // And extruded rectangle with dog bones at their end
 module dog_bone(dimensions, bit_diameter=1, center=false) {
   module hole() { cylinder(dimensions.z, d=bit_diameter, center=center, $fn=50); }
