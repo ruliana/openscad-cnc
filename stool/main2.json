@@ -1,0 +1,15 @@
+{
+    "parameterSets": {
+        "design default values": {
+            "$fn": "32",
+            "bit_diameter": "3.175",
+            "leg_depth": "400",
+            "leg_thickness": "60",
+            "material_thickness": "19.5",
+            "origin": "[0, 0]",
+            "seat_depth": "400",
+            "stool_height": "420"
+        }
+    },
+    "fileFormatVersion": "1"
+}

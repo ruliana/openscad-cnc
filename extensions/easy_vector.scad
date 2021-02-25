@@ -40,21 +40,29 @@ function rot(vec, angle) =
 
 // Mid point of a line
 function mid(v1, v2=[0, 0]) =
-  let(a = is_line(v1) ? v1[0] : v1,
-      b = is_line(v1) ? v1[1] : v2)
-  a + (a - b) / 2;
+  let(a = is_line(v1) ? radii_to_plain(v1[0]) : radii_to_plain(v1),
+      b = is_line(v1) ? radii_to_plain(v1[1]) : radii_to_plain(v2))
+  a + (b - a) / 2;
 
 // Point in line v1-->v2 that's _target_ distance from v1.
 // Target can also be a vector, in this case, y will be
 // perpendicular to the line.
-// TODO: implement perpendicular
-function in_line(v1, v2, target) =
-  let(v = v2 - v1,
-      unit_x = v / norm(v),
-      unit_y = [0, 0])
-  is_num(target)
-  ? target * unit_x + v1
-  : target.x * unit_x + target.y * unit_y + v1;
+function in_line(line, target, restrict=false) =
+  let(original_vector = line[1] - line[0],
+      unit_x = original_vector / norm(original_vector),
+      unit_y = rot(unit_x, 90),
+      new_vector = is_num(target)
+        ? target * unit_x
+        : target.x * unit_x + target.y * unit_y)
+  !restrict ? new_vector + line[0]
+  : norm(new_vector) > norm(original_vector) ? line[1]
+  : norm(new_vector) < 0 ? line[0]
+  : new_vector + line[0];
+
+// Parallel line at distance from the given one
+function parallel(line, distance) =
+  [in_line([line.x, line.y], [0, distance]),
+   in_line([line.y, line.x], [0, -distance])];
 
 // Auxiliar to the function "crossing"
 function cross_product(v1, v2) = v1.x * v2.y - v1.y * v2.x;
