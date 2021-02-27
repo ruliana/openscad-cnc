@@ -1,26 +1,34 @@
 use <../extensions/easy_movement.scad>;
 use <../extensions/mirror_translate.scad>;
 
-// Width of the square part.
-model_width = 160;
+/* [Render] */
 
-// Support height.
-model_height = 0.5 * model_width;
+model_part = "single_pack"; // [single_pack:Single Pack, 4_pack:4 Pack, ring:Ring, external_leg:External Leg, internal_leg:Internal Leg, jigs:Jigs]
 
-// How "deep" is the leg. To make it square, use the same value as the thickness.
-leg_thickness = 30;
-
-// Material thickness.
-thickness = 19.5;
-
-// Pack of 4 in a square sheet.
-4_pack = false;
+// Gap between the pieces in flat pack.
+gap = 10;
 
 // Jig for rounding corners with a router.
 include_jigs = true;
 
-// Gap between the pieces in flat pack.
-gap = 10;
+/* [Dimensions] */
+
+// Width of the square part.
+model_width = 160;
+
+// Support height.
+model_height = 80;
+
+/* [Design] */
+
+// How "deep" is the leg. To make it square, use the same value as the thickness.
+leg_thickness = 30;
+
+
+/* [Construction parameters] */
+
+//    Material thickness.
+thickness = 19.5;
 
 // Make slightly larger cuts to fit the pieces better.
 slack = 0.01;
@@ -174,10 +182,23 @@ module 4x_stock_area() {
   }
 }
 
-if (4_pack) {
-  4x_flat_pack();
-  4x_stock_area();
-} else {
+if (model_part == "single_pack") {
   single_flat_pack();
   single_stock_area();
+} else if (model_part == "4_pack") {
+  4x_flat_pack();
+  4x_stock_area();
+} else if (model_part == "ring") {
+  external_ring();
+} else if (model_part == "external_leg") {
+  rg(2 * model_height + 0.5 * model_width + 2 * gap + 0.5 * thickness)
+    rotate([0, 0, 90])
+      half_ring("outer");
+} else if (model_part == "internal_leg") {
+  rg(model_height + 0.5 * model_width + gap)
+    rotate([0, 0, 90])
+      half_ring("inner");
+} else if (model_part == "jigs") {
+  bw(leg_thickness + slack) router_jig(pocket=false);
+  fw(thickness) router_jig(double=true);
 }
