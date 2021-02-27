@@ -22,9 +22,9 @@ leg_base_depth = 360; // [100:5:800]
 
 /* [Design] */
 leg_thickness = 60; //[30:5:200]
-corner_radius = 30; //[0:5:200]
+seat_corner_radius = 30; //[0:5:300]
+leg_corner_radius = 30; //[0:5:300]
 support_overhang = 60; //[0:5:200]
-
 
 /* [Hidden] */
 $fn = 32;
@@ -34,6 +34,7 @@ origin = [0, 0];
 material_thickness = 19.5;
 bit_diameter = 3.175;
 bit_radius = bit_diameter / 2;
+
 
 leg_height = [0, stool_height - material_thickness / 2];
 
@@ -93,10 +94,10 @@ module leg() {
   // ==========
   module leg_structure() {
     points = [origin,
-              rpoint(base_line_ext[1], corner_radius),
+              rpoint(base_line_ext[1], leg_corner_radius),
               leg_top_corner_ext,
               leg_top_corner_int,
-              rpoint(bottom_elbow_int, corner_radius / 3),
+              rpoint(bottom_elbow_int, leg_corner_radius / 3),
               base_line_int[0]];
 
     polygon(polyRound(rpoints(points), 32));
@@ -179,7 +180,7 @@ module seat() {
               top_corner_int];
 
     linear_extrude(material_thickness)
-      polygon(polyRound(rpoints(points, corner_radius), 32));
+      polygon(polyRound(rpoints(points, seat_corner_radius), 32));
   }
 
   translate([0, -seat_depth / 2, stool_height - material_thickness])
@@ -230,7 +231,6 @@ module seat_support() {
 // ==========
 // Assemble
 // ==========
-echo("========");
 seat();
 base_support();
 seat_support();
