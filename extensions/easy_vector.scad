@@ -59,19 +59,34 @@ function in_line(line, target, restrict=false) =
   : norm(new_vector) < 0 ? line[0]
   : new_vector + line[0];
 
+// Mirrors the object around line center.
+module in_line_mirror(line, distance, restrict=false) {
+  center = mid(line);
+  right_line = [center, line[1]];
+  left_line = [center, line[0]];
+
+  dist = is_num(distance) ? distance : [distance.x, -distance.y];
+  left_anchor = in_line(left_line, dist, restrict=restrict);
+  right_anchor = in_line(right_line, distance, restrict=restrict);
+
+  translate(left_anchor)
+    children();
+
+  translate(right_anchor)
+    mirror([1, 0, 0]) children();
+}
+
 // Parallel line at distance from the given one
 function parallel(line, distance) =
   [in_line([line.x, line.y], [0, distance]),
    in_line([line.y, line.x], [0, -distance])];
 
-// Auxiliar to the function "crossing"
-function cross_product(v1, v2) = v1.x * v2.y - v1.y * v2.x;
-
 // Point crossing 2 lines
 // TODO: Test parallel lines
 // TODO: Test collinear lines
 function crossing(line1, line2) =
-  let(p = radii_to_plain(line1[0]),
+  let(cross_product = function(v1, v2) v1.x * v2.y - v1.y * v2.x,
+      p = radii_to_plain(line1[0]),
       r = radii_to_plain(line1[1] - line1[0]),
       q = radii_to_plain(line2[0]),
       s = radii_to_plain(line2[1] - line2[0]),

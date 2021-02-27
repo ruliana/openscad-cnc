@@ -23,7 +23,7 @@ slack = 0.01;
 curve_segments = 64; // [4, 8, 16, 32, 64, 128, 256]
 $fn = curve_segments;
 
-// End bit diameter (3.175 = 1/8in).
+// End bit diameter (3.175mm = 1/8in).
 bit_diameter = 3.175;
 
 module round_corner(radius) {
@@ -149,6 +149,7 @@ module stock_area() {
     fw(0.5 * model_size + leg_thickness + gap) {
      flat_pack_width = model_size + 2 * (gap + (model_size - 2 * gap));
      flat_pack_depth = model_size + leg_thickness + gap;
+     translate([0, -15, 0])
      text(str(flat_pack_width, "mm x ", flat_pack_depth, "mm"));
      square([flat_pack_width, flat_pack_depth]);
   }

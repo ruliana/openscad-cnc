@@ -1,11 +1,16 @@
 use <../extensions/easy_debug.scad>
 use <../extensions/easy_vector.scad>
+use <../extensions/easy_rotate.scad>
 use <../extensions/easy_pocket.scad>
+use <../extensions/mirror_translate.scad>
 use <../extensions/Round-Anything/polyround.scad>
 
 /* [Width] */
 seat_width = 460; // [100:5:800]
 leg_width = 460; // [100:5:800]
+
+/* Legs are never wider than the seat */
+leg_width_restricted = min(leg_width, seat_width);
 
 /* [Height] */
 stool_height = 420; // [190:5:750]
@@ -16,8 +21,10 @@ leg_top_depth = 320; // [100:5:800]
 leg_base_depth = 360; // [100:5:800]
 
 /* [Design] */
-leg_thickness = 60; //[30:5:160]
-corner_radius = 30; //[0:5:100]
+leg_thickness = 60; //[30:5:200]
+corner_radius = 30; //[0:5:200]
+support_overhang = 60; //[0:5:200]
+
 
 /* [Hidden] */
 $fn = 32;
@@ -63,6 +70,22 @@ function leg_to_seat_dowel_points() =
      leg_top_corner_ext - gap_x + gap_y,
      leg_top_corner_int + gap_x + gap_y];
 
+function top_dowel_snap_point() =
+  let(
+      limit_ext = enough_dowel_thickness
+                  ? leg_top_corner_ext - [material_thickness, -material_thickness / 2]
+                  : leg_top_corner_ext - [material_thickness / 2, - material_thickness / 2],
+      limit_int = enough_dowel_thickness
+                  ? leg_top_corner_int + [material_thickness, material_thickness / 2]
+                  : leg_top_corner_int + [material_thickness / 2, material_thickness / 2],
+      top_dowel = parallel(leg_top_line, material_thickness / 2),
+      top_dowel_mid = crossing(top_dowel, lateral_line_mid),
+      pure_vertex = lateral_line_mid[1] - lateral_line_mid[0],
+      dist = leg_thickness * pure_vertex.x / pure_vertex.y,
+      snap_point = top_dowel_mid - [dist, 0])
+  snap_point.x > limit_ext.x ? limit_ext
+  : snap_point.x < limit_int.x ? limit_int
+  : snap_point;
 
 module leg() {
   // ==========
@@ -99,23 +122,6 @@ module leg() {
     }
   }
 
-  function top_dowel_snap_point() =
-    let(
-        limit_ext = enough_dowel_thickness
-                    ? leg_top_corner_ext - [material_thickness, -material_thickness / 2]
-                    : leg_top_corner_ext - [material_thickness / 2, - material_thickness / 2],
-        limit_int = enough_dowel_thickness
-                    ? leg_top_corner_int + [material_thickness, material_thickness / 2]
-                    : leg_top_corner_int + [material_thickness / 2, material_thickness / 2],
-        top_dowel = parallel(leg_top_line, material_thickness / 2),
-        top_dowel_mid = crossing(top_dowel, lateral_line_mid),
-        pure_vertex = lateral_line_mid[1] - lateral_line_mid[0],
-        dist = leg_thickness * pure_vertex.x / pure_vertex.y,
-        snap_point = top_dowel_mid - [dist, 0])
-    snap_point.x > limit_ext.x ? limit_ext
-    : snap_point.x < limit_int.x ? limit_int
-    : snap_point;
-
   // ==========
   // Assemble
   // ==========
@@ -131,11 +137,11 @@ module leg() {
     }
   }
 
-  rotate([90, 0, 90])
-   linear_extrude(material_thickness) {
-     half_leg();
-     mirror([1, 0, 0]) half_leg();
-   }
+  rotate(to_right())
+     linear_extrude(material_thickness) {
+       half_leg();
+       mirror([1, 0, 0]) half_leg();
+     }
 }
 
 module seat() {
@@ -156,12 +162,12 @@ module seat() {
 
         // Top dowels
         translate([0, mid_depth.y + distance_from_mid])
-            leg_positioning(base_guide, leg_width / 2)
+            in_line_mirror(base_guide, leg_width_restricted / 2)
               pocket(material_thickness, height, snap_point=sw());
 
         // Bottom dowels
         translate([0, mid_depth.y - distance_from_mid])
-          leg_positioning(base_guide, leg_width / 2)
+          in_line_mirror(base_guide, leg_width_restricted / 2)
             pocket(material_thickness, height, snap_point=nw());
       }
   }
@@ -183,25 +189,51 @@ module seat() {
     }
 }
 
-module leg_positioning(line, distance) {
-  center = mid(line);
-  right_line = [center, line[1]];
-  left_line = [center, line[0]];
+module support(top_peg=false) {
+  extra_width = support_overhang * 2;
+  width = min(leg_width_restricted + extra_width, seat_width);
+  height = leg_thickness;
+  depth = material_thickness;
+  pocket_width = material_thickness;
+  pocket_height = leg_thickness / 2;
 
-  left_anchor = in_line(left_line, distance, restrict=true);
-  right_anchor = in_line(right_line, distance, restrict=true);
+  rotate(to_front())
+    translate([(seat_width - width) / 2, 0, -depth / 2])
+      linear_extrude(depth)
+        difference() {
+          union() {
+            square([width, height]);
 
-  translate(left_anchor)
-    children();
+            if (top_peg)
+              in_line_mirror([origin, [width, 0]], [leg_width_restricted / 2, leg_thickness], restrict=true)
+                square([material_thickness, material_thickness / 2]);
+          }
 
-  translate(right_anchor)
-    mirror([1, 0, 0]) children();
+          in_line_mirror([origin, [width, 0]], leg_width_restricted / 2, restrict=true)
+            pocket(pocket_width, pocket_height, fillet=u_shaped());
+        }
+}
+
+module base_support() {
+  support();
+}
+
+module seat_support() {
+  // Support positioning
+  translate([0, 0, top_dowel_snap_point().y - material_thickness / 2])
+    mirror_translate([0, top_dowel_snap_point().x, 0])
+      // Fix anchoring
+      translate([0, 0, -leg_thickness])
+        support(top_peg=true);
 }
 
 // ==========
 // Assemble
 // ==========
 echo("========");
-base_guide = [origin, [seat_width, 0]];
-leg_positioning(base_guide, leg_width / 2) leg();
 seat();
+base_support();
+seat_support();
+// Leg
+base_guide = [origin, [seat_width, 0]];
+in_line_mirror(base_guide, leg_width_restricted / 2) leg();
