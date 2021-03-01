@@ -229,9 +229,9 @@ module seat_support() {
 // ==========
 
 if (view == "assembled") {
-  translate([0, 0, 20]) seat();
+  seat();
   base_support();
-  %seat_support();
+  seat_support();
   // Leg
   in_line_mirror(base_guide, leg_width_restricted / 2) leg();
 } else if (view == "seat") {
