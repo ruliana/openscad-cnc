@@ -15,7 +15,7 @@ function se() = [-1, 0];
 function ne() = [-1, -1];
 function nw() = [0, -1];
 
-module pocket(width, height, bit_diameter=3.175, clearance=0.05, snap_point=sw(), fillet=dogbone()) {
+module pocket(width, height, bit_diameter=3.175, clearance=0.01, snap_point=sw(), fillet=dogbone()) {
   bit_radius = bit_diameter / 2;
 
   right = width + clearance;

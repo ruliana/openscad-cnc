@@ -5,6 +5,8 @@ use <../extensions/easy_pocket.scad>
 use <../extensions/mirror_translate.scad>
 use <../extensions/Round-Anything/polyround.scad>
 
+view = "assembled"; // [assembled:Assembled, seat:Seat, leg:Leg, base_support:Base Support, seat_support:Seat Support]
+
 /* [Width] */
 seat_width = 460; // [100:5:800]
 leg_width = 460; // [100:5:800]
@@ -34,6 +36,7 @@ origin = [0, 0];
 material_thickness = 19.5;
 bit_diameter = 3.175;
 bit_radius = bit_diameter / 2;
+pocket_allowance = 0.01;
 
 
 leg_height = [0, stool_height - material_thickness / 2];
@@ -58,9 +61,7 @@ lateral_line_int = parallel(lateral_line_ext, leg_thickness);
 bottom_elbow_int = crossing(base_line_int, lateral_line_int);
 leg_top_corner_int = crossing(leg_top_line, lateral_line_int);
 leg_top_corner_ext = crossing(leg_top_line, lateral_line_ext);
-
-// Ignore the dowel and restrictions if the leg is too thin
-enough_dowel_thickness = leg_thickness > 2.5 * material_thickness;
+base_guide = [origin, [seat_width, 0]];
 
 function leg_to_seat_dowel_points() =
   let(
@@ -73,12 +74,8 @@ function leg_to_seat_dowel_points() =
 
 function top_dowel_snap_point() =
   let(
-      limit_ext = enough_dowel_thickness
-                  ? leg_top_corner_ext - [material_thickness, -material_thickness / 2]
-                  : leg_top_corner_ext - [material_thickness / 2, - material_thickness / 2],
-      limit_int = enough_dowel_thickness
-                  ? leg_top_corner_int + [material_thickness, material_thickness / 2]
-                  : leg_top_corner_int + [material_thickness / 2, material_thickness / 2],
+      limit_ext = leg_top_corner_ext - [material_thickness / 2, -material_thickness / 2],
+      limit_int = leg_top_corner_int + [material_thickness / 2, material_thickness / 2],
       top_dowel = parallel(leg_top_line, material_thickness / 2),
       top_dowel_mid = crossing(top_dowel, lateral_line_mid),
       pure_vertex = lateral_line_mid[1] - lateral_line_mid[0],
@@ -104,8 +101,7 @@ module leg() {
   }
 
   module leg_to_seat_dowel() {
-    if (enough_dowel_thickness)
-      polygon(leg_to_seat_dowel_points());
+    polygon(leg_to_seat_dowel_points());
   }
 
   module leg_pocket(extra_height=false) {
@@ -113,7 +109,7 @@ module leg() {
     height = extra_height
       ? leg_thickness / 2 + extra_height
       : leg_thickness / 2;
-    pocket(width, height, fillet=u_shaped_south(), snap_point=north());
+    pocket(width, height, clearance=pocket_allowance, fillet=u_shaped_south(), snap_point=north());
   }
 
   module leg_outline() {
@@ -164,7 +160,7 @@ module seat() {
         // Top dowels
         translate([0, mid_depth.y + distance_from_mid])
             in_line_mirror(base_guide, leg_width_restricted / 2)
-              pocket(material_thickness, height, snap_point=sw());
+              pocket(material_thickness, height, clearance=pocket_allowance, snap_point=sw());
 
         // Bottom dowels
         translate([0, mid_depth.y - distance_from_mid])
@@ -206,12 +202,12 @@ module support(top_peg=false) {
             square([width, height]);
 
             if (top_peg)
-              in_line_mirror([origin, [width, 0]], [leg_width_restricted / 2, leg_thickness], restrict=true)
+              in_line_mirror([origin, [width, 0]], [leg_width_restricted / 2, leg_thickness])
                 square([material_thickness, material_thickness / 2]);
           }
 
           in_line_mirror([origin, [width, 0]], leg_width_restricted / 2, restrict=true)
-            pocket(pocket_width, pocket_height, fillet=u_shaped());
+            pocket(pocket_width, pocket_height, clearance=pocket_allowance, fillet=u_shaped());
         }
 }
 
@@ -231,9 +227,25 @@ module seat_support() {
 // ==========
 // Assemble
 // ==========
-seat();
-base_support();
-seat_support();
-// Leg
-base_guide = [origin, [seat_width, 0]];
-in_line_mirror(base_guide, leg_width_restricted / 2) leg();
+
+if (view == "assembled") {
+  translate([0, 0, 20]) seat();
+  base_support();
+  %seat_support();
+  // Leg
+  in_line_mirror(base_guide, leg_width_restricted / 2) leg();
+} else if (view == "seat") {
+  rotate([180, 0, 0])
+   translate([0, 0, -stool_height])
+     seat();
+} else if (view == "leg") {
+  rotate([-90, -90, 0]) leg();
+} else if (view == "base_support") {
+  rotate([90, 0, 0])
+    translate([0, material_thickness / 2, -leg_thickness])
+      base_support();
+} else if (view == "seat_support") {
+  rotate([-90, 0, 0])
+    translate([0, -material_thickness / 2, 0])
+      support(top_peg=true);
+}
