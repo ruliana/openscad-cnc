@@ -125,7 +125,6 @@ module casing() {
               [0, depth, ext_round]];
     polygon(polyRound(points, 32));
   }
-  contour();
   linear_extrude(casing_height) {
     difference() {
       contour();
