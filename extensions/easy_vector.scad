@@ -3,7 +3,7 @@ use <Round-Anything/polyround.scad>
 Fundamental types:
    Plain point is [x, y]
    Radii point is [x, y, radius]
-   Point is simple point or radii point
+   Point is a simple point or radii point
    Line is [point, point]
    Polyline is [point, point, point...]
 
