@@ -1,6 +1,6 @@
 use <easy_vector.scad>
 
-function dogbone() = [for (angle = [45, 135, 225, 315]) rot([1, 0], angle)];
+function dogbone() = [for (angle = [45, 135, 225, 315]) rotation([1, 0], angle)];
 function u_shaped() = [[1, 0], [-1, 0], [-1, 0], [1, 0]];
 function u_shaped_south() = [[1, 0], [-1, 0], false, false];
 function t_shaped() = [[0, 1], [0, 1], [0, -1], [0, -1]];
