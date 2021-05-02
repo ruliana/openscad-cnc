@@ -1,4 +1,3 @@
-use <Round-Anything/polyround.scad>
 /*
 Fundamental types:
    Plain point is [x, y]
@@ -32,9 +31,6 @@ function radii_to_plain(target) =
 
 function plain_to_radii(target, radius) =
   [for (p = target) [p.x, p.y, radius]];
-
-function round_corners(target, radius) =
-  polyRound(plain_to_radii(target, radius), $fn);
 
 /* Create basis transformation functions */
 function basis_transformer(target_origin, target_x, target_y) =
