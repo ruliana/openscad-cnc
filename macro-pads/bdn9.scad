@@ -1,9 +1,9 @@
 use <../extensions/easy_movement.scad>
 use <../extensions/easy_vector.scad>
-use <../extensions/Round-Anything/polyround.scad>
+use <../extensions/renamed_commands.scad>
 
 $fn = 32;
-show = "flat_pack"; // [flat_pack:Flat Pack, exploded:Exploded]
+show = "exploded"; // [flat_pack:Flat Pack, exploded:Exploded, base_plate:Base Plate, switch_plate:Switch Plate, casing:Casing]
 explosion_gap = 3;
 flat_pack_gap = 5;
 
@@ -45,7 +45,7 @@ function to_square(width, depth) =
 module plate() {
   $fn = 16;
   plate = to_square(plate_width, plate_depth);
-  polygon(round_corners(plate, plate_corner_radius));
+  round_corners(plate, plate_corner_radius);
 }
 
 module switch_holes() {
@@ -58,7 +58,7 @@ module switch_holes() {
       separation = mov([i * h_spacing, j * v_spacing]);
       displacement = mov([plate_padding_west, plate_padding_south]);
       hole = apply(switch_hole, displacement * separation);
-      polygon(round_corners(hole, switch_corner_radius));
+      round_corners(hole, switch_corner_radius);
     }
   }
 }
@@ -123,7 +123,7 @@ module casing() {
               [1/2 * (width - gap), depth - padding, ext_round],
               [1/2 * (width - gap), depth, ext_round],
               [0, depth, ext_round]];
-    polygon(polyRound(points, 32));
+    polyround(points);
   }
   linear_extrude(casing_height) {
     difference() {
@@ -151,4 +151,10 @@ if (show == "exploded") {
   exploded();
 } else if (show == "flat_pack") {
   flat_pack();
-}
+} else if (show == "base_plate") {
+  base_plate();
+} else if (show == "switch_plate") {
+  switch_plate();
+} else if (show == "casing") {
+ casing();
+ }

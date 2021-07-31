@@ -1,6 +1,6 @@
 use <../extensions/easy_vector.scad>
 use <../extensions/easy_debug.scad>
-use <../extensions/Round-Anything/polyround.scad>
+use <../extensions/renamed_commands.scad>
 
 shelf_width = 350;
 shelf_height = 380;
@@ -47,8 +47,8 @@ show(leg_outline());
 show(leg_inline());
 
 difference() {
-  polygon(polyRound(apply_leg_radii(leg_outline(), 30)));
-  polygon(polyRound(apply_leg_radii(leg_inline(), 10)));
+  polyround(apply_leg_radii(leg_outline(), 30));
+  polyround(apply_leg_radii(leg_inline(), 10));
 }
 
 
