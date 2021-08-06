@@ -1,6 +1,7 @@
 use <easy_vector.scad>
 
 function dogbone() = [for (angle = [45, 135, 225, 315]) rotation([1, 0], angle)];
+function dogbone_west() = [dogbone()[0], false, false, dogbone()[3]];
 function u_shaped() = [[1, 0], [-1, 0], [-1, 0], [1, 0]];
 function u_shaped_south() = [[1, 0], [-1, 0], false, false];
 function t_shaped() = [[0, 1], [0, 1], [0, -1], [0, -1]];
@@ -15,7 +16,12 @@ function se() = [-1, 0];
 function ne() = [-1, -1];
 function nw() = [0, -1];
 
-module pocket(width, height, bit_diameter=3.175, clearance=0.01, snap_point=sw(), fillet=dogbone()) {
+module pocket(width,
+              height,
+              bit_diameter=3.175,
+              clearance=0.01,
+              snap_point=sw(),
+              fillet=dogbone()) {
   bit_radius = bit_diameter / 2;
 
   right = width + clearance;
