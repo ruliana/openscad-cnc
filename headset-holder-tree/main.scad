@@ -4,9 +4,7 @@ use <../extensions/renamed_commands.scad>
 use <../extensions/easy_debug.scad>
 
 $fn = 256;
-show = "exploded"; // [flat_pack:Flat Pack, exploded:Exploded]
-explosion_gap = 3;
-flat_pack_gap = 5;
+show = "assembled"; // [assembled:Assembled, base:Base, stem:Stem]
 
 material_thickness = 19;
 
@@ -19,9 +17,6 @@ holder_depth = 150;
 frame_thickness = 19;
 stem_displacement = 0;
 stem_width = 100;
-cap_radius = 70;
-cap_angle = 135;
-cap_tilt = 15;
 
 module base() {
   thickness = material_thickness;
@@ -30,37 +25,11 @@ module base() {
   difference() {
     extrude(thickness)
       circle(d=holder_width);
+    twin_stems();
   }
 }
 
-/* module ellipsoid(width, height, thickness) { */
-/*   radius = 0.5 * width; */
-/*   stem_height = 0.5 * (height - 2 * radius); */
-
-/*   module shell() { */
-/*     hull() { */
-/*       bw(stem_height) */
-/*         circle(radius); */
-/*       bw(-stem_height) */
-/*         circle(radius); */
-/*     } */
-/*   } */
-
-/*   module 2d_ellipsoid() { */
-/*     difference() { */
-/*       shell(); */
-/*       offset(-thickness) shell(); */
-/*     } */
-/*   } */
-
-/*   bw(0.5 * material_thickness) */
-/*   up(stem_height + radius) */
-/*   rotate([90, 0, 0]) */
-/*   extrude(material_thickness) */
-/*     2d_ellipsoid(); */
-/* } */
-
-module ellipsoid(width, height, thickness) {
+module stem_shape(width, height, thickness) {
 
   base_width = 0.4;
 
@@ -68,7 +37,7 @@ module ellipsoid(width, height, thickness) {
   middle_pos = 0.7;
   middle_curve = 600;
 
-  points = [[base_width * width, 0, 0],
+  points = [[base_width * width, 0.25 * material_thickness, 0],
             [base_width * width, 1.15 * material_thickness, 0],
             [middle_width * width, middle_pos * height, middle_curve],
             [0, height, 6 * thickness],
@@ -89,51 +58,26 @@ module ellipsoid(width, height, thickness) {
 module stem(height = holder_height) {
   rotate([0, 0, 90])
   fw(stem_displacement)
-    ellipsoid(stem_width, height, frame_thickness);
+    stem_shape(stem_width, height, frame_thickness);
 }
 
-module half_cap() {
-  thickness = 1.5 * frame_thickness;
-  radius = frame_thickness; // TODO replace it by "groove_depth"?
+module twin_stems() {
+  lf(material_thickness) stem();
+  mirror([0, 1, 0]) rg(material_thickness) stem();
+}
 
-  module cap_contour() {
-    rg(cap_radius - thickness)
-      difference() {
-        square([thickness, 2 * radius]);
-        bw(radius) rg(thickness + 0.6 * radius)
-          circle(radius);
-    }
+
+
+if (show == "assembled") {
+  rotate([0, 0, 90]) {
+    base();
+    twin_stems();
   }
-
-  rotate_extrude(angle=cap_angle)
-    cap_contour();
+} else if (show == "base") {
+  base();
+} else if (show == "stem") {
+  fw(0.25 * material_thickness)
+    up(0.5 * material_thickness)
+      rotate([0, -90, -90])
+        stem();
 }
-
-module right_half_cap() {
-  half_cap();
-}
-
-module left_half_cap() {
-  mirror([0, 0, 1])
-    dn(frame_thickness)
-      half_cap();
-}
-
-module cap() {
-  up(holder_height - cap_radius)
-  bw(material_thickness)
-  rotate([0, -cap_tilt, 0])
-  rotate([90, 0, 0]) {
-    up(material_thickness) left_half_cap();
-    right_half_cap();
-  }
-}
-
-/* rotate([90, 0, 0]) */
-/* show([[0, 0], [0, holder_height]]); */
-
-%base();
-*stem();
-lf(material_thickness) stem();
-mirror([0, 1, 0]) rg(material_thickness) stem();
-*cap();
