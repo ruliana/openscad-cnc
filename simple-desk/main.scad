@@ -11,7 +11,7 @@ exploding_distance = 0; // [0:20:200]
 /* [Dimensions] */
 desk_height = 505;
 desk_width = 600;
-desk_depth = 505;
+desk_depth = 500;
 
 /* [Style] */
 handle_width = 120;
@@ -20,8 +20,8 @@ handle_distance_from_top = 80;
 support_height = 150;
 
 /* [Construction] */
-leg_thickness = 20;
-top_thickness = 10;
+leg_thickness = 19.5;
+top_thickness = 12;
 bit_diameter = 6.35;
 
 leg_height = desk_height - top_thickness;
