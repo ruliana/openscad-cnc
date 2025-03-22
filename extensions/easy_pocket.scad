@@ -22,6 +22,7 @@ module pocket(width,
               clearance=0.01,
               snap_point=sw(),
               fillet=dogbone()) {
+  $fn=32;
   bit_radius = bit_diameter / 2;
 
   right = width + clearance;
